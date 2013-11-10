@@ -1,0 +1,13 @@
+{
+    "packageJSONTemplate": "app/templates/_package.json",
+    "extensions": {
+        "https://github.com/yeoman/generator-backbone.git": {
+            "generator": "backbone",
+            "version": ">=0.0.0",
+            "subgenerators": ["model","view","collection","router"]
+        },
+
+        "generator:subgenerator": "0.1.0",
+        "bower-amd": "*"
+    }
+}

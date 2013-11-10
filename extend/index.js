@@ -14,112 +14,196 @@ var util = require('util'),
 	yeoman = require('yeoman-generator'),
 
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
 
-var ExtensionGenerator = module.exports = function ExtensionGenerator(args, options, config) {
-    yeoman.generators.Base.apply(this, arguments);
+    jsonf = require('json-file'),
 
-	console.log('You called the extend subgenerator with the argument ' + args + '.');
+    YoExtensions = require('../lib/yo-extensions');
+
+
+
+////////////////////////////////////
+// constructor & argument parsing //
+
+var ExtensionGenerator = module.exports = function(args, options, config) {
+	yeoman.generators.Base.apply(this, arguments);
+
+
+    if (args[0]) {
+        // additions to the yoextensions.json file.
+        this.extension = args[0];
+        this.extensionVersion = args[1];
+
+        this.log.info('You called the extend subgenerator with the argument ' + args + '.');
+    } else {
+        // no additions to the yoextensions.json file.
+        // just reat whatever is therer
+        this.log.info('You called the extend subgenerator without any arguments.')
+    }
 };
-
 
 util.inherits(ExtensionGenerator, yeoman.generators.Base);
 
+// constructor & argument parsing //
+////////////////////////////////////
 
+//////////////////////
+// internal methods //
+ExtensionGenerator.prototype._proxy = function(name) {
 
+    this.log.create('Creating a proxy generator for '+ name);
 
+    // name = generator[:subgenerator]
+    var generator = name.split(':')[0],
+        subgenerator = name.split(':')[1] || 'app';
 
+    if (!generator) {
+        throw new Error('ExtensionGenerator.prototype._proxy method must receive a generator argument.');
+    }
 
-ExtensionGenerator.prototype._createInheritanceJSON = function() {
-	this.template('_extensions.json','extensions.json');
+    this.mkdir(subgenerator);
+    this.template('_proxy-index.js', subgenerator + '/index.js', {
+        generator: generator,
+        subgenerator: subgenerator,
+    });
+
+    if (subgenerator === 'app') {
+
+        var message =
+            '\n You are now using <%= generator %> app subgenerator as your own' +
+            '\n generator\'s app subgenerator.' +
+            '\n The generators that your generator extends might ' +
+            '\n not have been included in the devDependencies of the package.json ' +
+            '\n as the default extendable-generator\'s app generator was not run. \n' +
+            '\n To overcome possible issues, make sure you have the following ' +
+            '\n packages either installed globally or locally in the generated project\s node_modules.';
+
+        console.log(chalk.yellow(message));
+
+    }
 };
 /**
-Helper method that creates the extensions.json
+Method creates a proxy subgenerator.
 */
 
-ExtensionGenerator.prototype._updateInheritanceJSON = function() {
-	console.log('Update extensions.json');
+// internal methods //
+//////////////////////
 
 
-	var extensions = JSON.parse(this.readFileAsString('extensions.json'));
+
+
+//////////////////////
+// generation steps //
+
+ExtensionGenerator.prototype.readJSONdata = function() {
+    this.log.info('Reading package.json ...');
+
+    var src = this.sourceRoot(),
+        dest = this.destinationRoot();
+
+    // packageJSON
+    this.packageJSON = jsonf.read(path.join(dest, 'package.json'));
+
+
+    this.log.info('Reading yoextensions.json ...');
+
+	// yoExtensionsJSON
+	this.yoExtensionsJSON = new YoExtensions(path.join(dest, 'yoextensions.json'));
+
+
+    this.log.info('Reading ' + this.yoExtensionsJSON.get('packageJSONTemplate') + ' ...');
+	// packageJSONTemplate
+	this.packageJSONTemplate = jsonf.read(path.join(dest, this.yoExtensionsJSON.get('packageJSONTemplate')) );
+}
+/**
+1
+Reads data from .json files that will be required further
+in the generation process.
+*/
+
+
+
+
+ExtensionGenerator.prototype.updateYoExtensionsJSON = function() {
+	// only change if there is an extension.
+	if (this.extensionName) {
+        // rewrite the file
+        this.log.info('Updating yoextensions.json: adding '+ this.extensionName + ' ' + this.extensionVersion);
+
+		this.yoExtensionsJSON
+            .set('extensions.'+ this.extensionName, this.extensionVersion)
+            .writeSync(null, '\t');
+	}
 };
 /**
-Helper method that updates the extensions.json
-called by .extensionsJSON
-*/
+2
+Update yoextensions.json according to arguments passed by user.
+Here is where the user input is actually processed.
 
-// util.inherits(ExtensionGenerator, yeoman.generators.NamedBase);
+yoextensions.json example:
+{
+    "packageJSONTemplate": "app/templates/_package.json",
+    "extensions": {
+        "https://github.com/yeoman/generator-backbone.git": {
+            "generator": "backbone",
+            "version": "",
+            "subgenerators": ["model","view","collection","router"]
+        },
 
-ExtensionGenerator.prototype.extensionsJSON = function() {
-
-	var cb = this.async(),
-
-		// read
-		extensionsJSONpath = path.join(this.destinationRoot(), 'extensions.json');
-
-	fs.readFile(extensionsJSONpath, function(err, data) {
-
-		if (err) {
-			this._createInheritanceJSON();
-		} else {
-			this._updateInheritanceJSON();
-		}
-
-
-		cb();
-
-	}.bind(this));
-
-};
-/**
-Attempts to read the extensions.json from current directory.
-If no extensions.json is available, creates a new one.
-*/
-
-
-/**
-From here on, work is redone multiple times.
-
-Methods should base their work on data at extensions.json.
-*/
-
-ExtensionGenerator.prototype.readInheritanceJSON = function() {
-	this.extensions = JSON.parse( this.readFileAsString('extensions.json') );
+        "generator:subgenrator": "*",
+        "bower-amd": "*"
+    }
 }
 
-
-ExtensionGenerator.prototype.installGenerators = function() {
-
-
-	var cb = this.async(),
-		generators = Object.keys(this.extensions.inherits);
-
-	console.log('Installing generators: ' + generators);
-
-};
-/**
-Installs the parent generator
 */
 
 
-ExtensionGenerator.prototype._symlink = function() {
 
+ExtensionGenerator.prototype.updatePackageJSONTemplate = function() {
+    this.log.info('Updating ' + this.yoExtensionsJSON.get('packageJSONTemplate') + ' ...');
+
+    var deps = this._.extend(
+        this.packageJSONTemplate.get('devDependencies'),
+        this.yoExtensionsJSON.dependencies()
+    );
+
+	// extend devDependencies and rewrite file.
+	this.packageJSONTemplate
+        .set('devDependencies', deps)
+        .writeSync(null, '\t');
 };
 /**
-Helper method that creates a symlink
+4
+Update package.json template file according to required extensions.
+*/
+
+ExtensionGenerator.prototype.updatePackageJSON = function() {
+    this.log.info('Updating package.json ...');
+
+    var deps = this._.extend(
+        this.packageJSON.get('devDependencies'),
+        this.yoExtensionsJSON.dependencies()
+    );
+
+    this.packageJSON.set('dependencies', deps)
+        .writeSync(null, '\t');
+};
+/**
+5
+Update package.json of the current generator
 */
 
 
-ExtensionGenerator.prototype.extensions = function() {
 
-	var _ = this._;
+ExtensionGenerator.prototype.proxyGenerators = function() {
+	this.log.info('Proxying generators...');
 
-	_.each(this.extensions.inherits, function(subgenerators, generator) {
-		console.log('Generator: ' + generator);
-		console.log('Sub: ' + subgenerators);
-	});
-
+	this._.each(Object.keys(this.yoExtensionsJSON.extensions()), this._proxy.bind(this));
 };
 /**
-Parses the extensions required by the user and calls _symlink accordingly.
+4
+Creates proxy generators.
 */
+
+// generation steps //
+//////////////////////
