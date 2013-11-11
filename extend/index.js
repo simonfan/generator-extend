@@ -49,7 +49,7 @@ util.inherits(ExtensionGenerator, yeoman.generators.Base);
 
 //////////////////////
 // internal methods //
-ExtensionGenerator.prototype._proxy = function(name) {
+ExtensionGenerator.prototype._proxy = function _proxy(name) {
 
     this.log.create('Creating a proxy generator for '+ name);
 
@@ -95,7 +95,7 @@ Method creates a proxy subgenerator.
 //////////////////////
 // generation steps //
 
-ExtensionGenerator.prototype.readJSONdata = function() {
+ExtensionGenerator.prototype.readJSONdata = function readJSONdata() {
     this.log.info('Reading package.json ...');
 
     var src = this.sourceRoot(),
@@ -124,7 +124,7 @@ in the generation process.
 
 
 
-ExtensionGenerator.prototype.updateYoExtensionsJSON = function() {
+ExtensionGenerator.prototype.updateYoExtensionsJSON = function updateYoExtensionsJSON() {
 	// only change if there is an extension.
 	if (this.extensionName) {
         // rewrite the file
@@ -139,27 +139,11 @@ ExtensionGenerator.prototype.updateYoExtensionsJSON = function() {
 2
 Update yoextensions.json according to arguments passed by user.
 Here is where the user input is actually processed.
-
-yoextensions.json example:
-{
-    "packageJSONTemplate": "app/templates/_package.json",
-    "extensions": {
-        "https://github.com/yeoman/generator-backbone.git": {
-            "generator": "backbone",
-            "version": "",
-            "subgenerators": ["model","view","collection","router"]
-        },
-
-        "generator:subgenrator": "*",
-        "bower-amd": "*"
-    }
-}
-
 */
 
 
 
-ExtensionGenerator.prototype.updatePackageJSONTemplate = function() {
+ExtensionGenerator.prototype.updatePackageJSONTemplate = function updatePackageJSONTemplate() {
     this.log.info('Updating ' + this.yoExtensionsJSON.get('packageJSONTemplate') + ' ...');
 
     var deps = this._.extend(
@@ -173,11 +157,11 @@ ExtensionGenerator.prototype.updatePackageJSONTemplate = function() {
         .writeSync(null, '\t');
 };
 /**
-4
+3
 Update package.json template file according to required extensions.
 */
 
-ExtensionGenerator.prototype.updatePackageJSON = function() {
+ExtensionGenerator.prototype.updatePackageJSON = function updatePackageJSON() {
     this.log.info('Updating package.json ...');
 
     var deps = this._.extend(
@@ -189,19 +173,19 @@ ExtensionGenerator.prototype.updatePackageJSON = function() {
         .writeSync(null, '\t');
 };
 /**
-5
+4
 Update package.json of the current generator
 */
 
 
 
-ExtensionGenerator.prototype.proxyGenerators = function() {
+ExtensionGenerator.prototype.proxyGenerators = function proxyGenerators() {
 	this.log.info('Proxying generators...');
 
 	this._.each(Object.keys(this.yoExtensionsJSON.extensions()), this._proxy.bind(this));
 };
 /**
-4
+5
 Creates proxy generators.
 */
 

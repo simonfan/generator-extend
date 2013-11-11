@@ -67,11 +67,7 @@ ExtendableGeneratorGenerator.prototype.askFor = function askFor() {
 		name: 'generatorName',
 		message: 'What\'s the base name of your generator?',
 		default: generatorName
-	}, {
-        name: 'extensions',
-        message: 'What generators would you like to extend? [generatorName:subgeneratorName separated by spaces]',
-        default: 'generator-generator:subgenerator'
-    }];
+	}];
 
 	this.prompt(prompts, function (props) {
 		this.githubUser = props.githubUser;
