@@ -1,4 +1,4 @@
-# Extendable Generator
+# Extendable Generator - Manual
 
 Maintainer: [Simon Fan](https://github.com/simonfan)
 
@@ -68,26 +68,32 @@ Object that describes all extensions required by the generator.
 ## Extending generators: via yoextensions.json
 
 Edit the yoextensions.json at the root of your new generator and run
-```
-yo extendable-generator:extend
-```
+
+    yo extendable-generator:extend
+
 
 
 ## Extending generators: via CLI
 
 At the root of your new generator, run
-```
-yo extendable-generator:extend %generatorName:%subgeneratorName
-```
 
+    yo extendable-generator:extend %generatorName:%subgeneratorName
 
-## Workflow
+## Example workflow
 
 
 
 ## Gotchas
 
+#### Extending `app` subgenerator
+
+Whenever the `app` subgenerator, the default `app` subgenerator's index.js file is overwritten by a proxy-generator that invokes the other generator.
 
 
 
-## History
+## Under the hood
+
+#### Proxy Generator
+
+
+#### lib/yo-extensions.js
