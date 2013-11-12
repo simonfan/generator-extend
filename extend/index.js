@@ -16,6 +16,7 @@ var util = require('util'),
 	fs = require('fs'),
 	path = require('path'),
 
+    chalk = require('chalk'),
     jsonf = require('json-file'),
 
     YoExtensions = require('../lib/yo-extensions');
@@ -111,9 +112,9 @@ ExtensionGenerator.prototype.readJSONdata = function readJSONdata() {
 	this.yoExtensionsJSON = new YoExtensions(path.join(dest, 'yoextensions.json'));
 
 
-    this.log.info('Reading ' + this.yoExtensionsJSON.get('packageJSONTemplate') + ' ...');
-	// packageJSONTemplate
-	this.packageJSONTemplate = jsonf.read(path.join(dest, this.yoExtensionsJSON.get('packageJSONTemplate')) );
+    this.log.info('Reading ' + this.yoExtensionsJSON.get('packageJsonTemplate') + ' ...');
+	// packageJsonTemplate
+	this.packageJsonTemplate = jsonf.read(path.join(dest, this.yoExtensionsJSON.get('packageJsonTemplate')) );
 }
 /**
 1
@@ -126,12 +127,12 @@ in the generation process.
 
 ExtensionGenerator.prototype.updateYoExtensionsJSON = function updateYoExtensionsJSON() {
 	// only change if there is an extension.
-	if (this.extensionName) {
+	if (this.extension) {
         // rewrite the file
-        this.log.info('Updating yoextensions.json: adding '+ this.extensionName + ' ' + this.extensionVersion);
+        this.log.info('Updating yoextensions.json: adding '+ this.extension + ' ' + this.extensionVersion);
 
 		this.yoExtensionsJSON
-            .set('extensions.'+ this.extensionName, this.extensionVersion)
+            .set('extensions.'+ this.extension, this.extensionVersion)
             .writeSync(null, '\t');
 	}
 };
@@ -144,15 +145,15 @@ Here is where the user input is actually processed.
 
 
 ExtensionGenerator.prototype.updatePackageJSONTemplate = function updatePackageJSONTemplate() {
-    this.log.info('Updating ' + this.yoExtensionsJSON.get('packageJSONTemplate') + ' ...');
+    this.log.info('Updating ' + this.yoExtensionsJSON.get('packageJsonTemplate') + ' ...');
 
     var deps = this._.extend(
-        this.packageJSONTemplate.get('devDependencies'),
+        this.packageJsonTemplate.get('devDependencies'),
         this.yoExtensionsJSON.dependencies()
     );
 
 	// extend devDependencies and rewrite file.
-	this.packageJSONTemplate
+	this.packageJsonTemplate
         .set('devDependencies', deps)
         .writeSync(null, '\t');
 };
@@ -169,7 +170,7 @@ ExtensionGenerator.prototype.updatePackageJSON = function updatePackageJSON() {
         this.yoExtensionsJSON.dependencies()
     );
 
-    this.packageJSON.set('dependencies', deps)
+    this.packageJSON.set('devDependencies', deps)
         .writeSync(null, '\t');
 };
 /**

@@ -4,7 +4,7 @@
  * It's primary purpose is to invoke
  * <%= generator %>'s subgenerator <%= subgenerator %>.
  *
- * The generator-<%= generator %> was added to the *packageJSONTemplate*
+ * The generator-<%= generator %> was added to the *packageJsonTemplate*
  * file specified in your yoextensions.json.
  *
  * If you wish to alter the version of the generator please do so in
@@ -13,15 +13,13 @@
  */
 'use strict';
 var util = require('util'),
-	yeoman = require('yeoman-generator'),
-
-    chalk = require('chalk');
+	yeoman = require('yeoman-generator');
 
 var Extension<%= _.classify(generator) + _.classify(subgenerator) %> = module.exports = function(args, options, config) {
 
 	yeoman.generators.Base.apply(this, arguments);
 
-	this.invoke('<%= generator %>:<%= subgenerator %>', {
+	this.invoke('<%= generator %><%if (subgenerator) { %>:subgenerator<% } %>', {
 		args: Array.prototype.slice.call(arguments, 0),
 	});
 

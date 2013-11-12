@@ -1,5 +1,5 @@
 {
-    "packageJSONTemplate": "app/templates/_package.json",
+    "packageJsonTemplate": "app/templates/_package.json",
     "extensions": {
         "https://github.com/yeoman/generator-backbone.git": {
             "generator": "backbone",

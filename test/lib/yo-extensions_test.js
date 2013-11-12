@@ -39,7 +39,7 @@ exports['test'] = {
 		test.expect(2);
 		// tests here
 		test.ok(yoextensionsJSON);
-		test.equal(yoextensionsJSON.file.get('packageJSONTemplate'), 'app/templates/_package.json');
+		test.equal(yoextensionsJSON.file.get('packageJsonTemplate'), 'app/templates/_package.json');
 
 		test.done();
 	},
