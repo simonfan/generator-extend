@@ -19,11 +19,11 @@ var ExtensionGeneratorApp = module.exports = function(args, options, config) {
 
 	yeoman.generators.Base.apply(this, arguments);
 
-	this.invoke('generator:app', {
+	this.hookFor('generator:app', {
 		args: Array.prototype.slice.call(arguments, 0),
 	});
 
-	
+
 
     //////////////////////////////////////////////////
 	// You have overridden the app generator,       //
@@ -32,8 +32,16 @@ var ExtensionGeneratorApp = module.exports = function(args, options, config) {
     // the generator dependencies manually.         //
     //////////////////////////////////////////////////
 
-	
 
+    // call after
+    this.hookFor('extendable-generator:extend', {
+        args: [],
+    });
 };
 
 util.inherits(ExtensionGeneratorApp, yeoman.generators.Base);
+
+ExtensionGeneratorApp.prototype.templateYoExtensions = function templateYoExtensions() {
+    // template yoextensions.json
+    this.template('_yoextensions.json','yoextensions.json');
+};
