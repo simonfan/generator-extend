@@ -19,7 +19,7 @@ var Extension<%= _.classify(generator) + _.classify(subgenerator) %> = module.ex
 
 	yeoman.generators.Base.apply(this, arguments);
 
-	this.invoke('<%= generator %><%if (subgenerator) { %>:subgenerator<% } %>', {
+	this.invoke('<%= generator %><%if (subgenerator) { %>:<%= subgenerator %><% } %>', {
 		args: Array.prototype.slice.call(arguments, 0),
 	});
 
