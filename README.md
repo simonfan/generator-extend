@@ -39,7 +39,7 @@ Object that describes all extensions required by the generator.
 
 > If both `$generatorName` and `$subgeneratorName` (e.g., generator:app, backbone:model) are specified in the key string: the generator being extended will have a subgenerator named '$subgeneratorName' which does whatever the original subgenerator did.
 
-> If only `$generatorName` is specified (e.g., backbone, angular): the subgenerators will be identified from the key's value (see below). 
+> If only `$generatorName` is specified (e.g., backbone, angular): `$subgeneratorName` will default to 'app', resulting in `$generatorName:app`.
 
 > **`Values`**
 

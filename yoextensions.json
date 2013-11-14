@@ -1,6 +1,0 @@
-{
-    "packageJsonTemplate": "app/templates/_package.json",
-    "extensions": {
-        "generator:app": "*"
-    }
-}
