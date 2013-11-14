@@ -13,9 +13,9 @@ var ExtensionGenerator = module.exports = function(args, options, config) {
 	yeoman.generators.Base.apply(this, arguments);
 
 
+	// args[0] = input = [$generator[:$subgenerator[|$subgenerator]]]
 	var input = args[0] || '';
 
-	// args[0] = $generator[:$subgenerator[|$subgenerator]]
 	this.generator = input.split(':')[0];
 
 	var sub = input.split(':')[1] || 'app';
@@ -69,7 +69,7 @@ ExtensionGenerator.prototype.askFor = function askFor() {
 
 	prompts.push({
 		name: 'package',
-		message: 'NPM package [npm install ...]',
+		message: 'Souce npm package',
 		default: function(answers) {
 			return 'generator-' + answers.generator
 		}
@@ -79,38 +79,13 @@ ExtensionGenerator.prototype.askFor = function askFor() {
 	*/
 
 	prompts.push({
-		name: 'version',
-		message: 'Package version [semver]',
+		name: 'version_or_source',
+		message: 'Package version or Package source',
 		default: '*'
 	});
-
-	prompts.push({
-		name: 'setPackageJsonTemplate',
-		message: 'Would you like me to add the package to the devDependencies of the package.json template file of your generator?',
-		type: 'confirm',
-	});
-
-	prompts.push({
-		name: 'packageJsonTemplatePath',
-		message: 'Deal! What is the path to your package.json template file?',
-		default: 'app/templates/_package.json',
-		when: function(answers) {
-			return answers.setPackageJsonTemplate;
-		},
-		validate: function(file) {
-			var done = this.async(),
-				p = path.join(dest, file);
-
-			fs.readFile(p, function(err, content) {
-
-				var r = err ? 'I found an error reading the file at ' +
-						p +'. Are you sure the path is right?' : true;
-
-				done(r);
-			});
-		}
-	});
-
+	/**
+	Semver version or source for the package.
+	*/
 
 	this.prompt(prompts, function(answers) {
 
@@ -120,27 +95,40 @@ ExtensionGenerator.prototype.askFor = function askFor() {
 	}.bind(this))
 };
 
-ExtensionGenerator.prototype.updatePackageJsonTemplate = function updatePackageJsonTemplate() {
-	if (this.setPackageJsonTemplate) {
 
-		this.log.info('Rewriting ' + this.packageJsonTemplatePath + ' in order to add ' + this.package + ' as a devDependency.');
+ExtensionGenerator.prototype.writeExtensionDependenciesJson = function writeExtensionDependenciesJson() {
 
-		var p = path.join(this.destinationRoot(), this.packageJsonTemplatePath),
-			file = jsonf.read(p),
+	var cb = this.async(),
+		// check if app/extension-dependencies.json already exists
+		p = path.join(this.destinationRoot(), 'app/extension-dependencies.json');
 
-			devDeps = this._.extend({}, file.get('devDependencies'));
+	fs.readFile(p, function(err, contents) {
 
-		// the package for this extension
-		devDeps[ this.package ] = this.version;
+		if (err) {
+			// create the file
+			this.write(p, JSON.stringify({}));
+		}
 
-		file.set('devDependencies', devDeps)
-			.writeSync(null, '\t');
-	}
+		cb();
+
+	}.bind(this));
 };
 /**
-Checks if user requested us to update the package.json template file.
-If so, add the package to the devDependencies of the package.json template file,
-so that the final generated project has the original generator as a development dependency.
+Check if app/extensions-dependencies.json file exists. If it doesn't, create one.
+*/
+
+ExtensionGenerator.prototype.updateExtensionsDependenciesJson = function updateExtensionsDependenciesJson() {
+
+	this.log.info('Updating extension dependencies (app/extension-dependencies.json)');
+
+	var p = path.join(this.destinationRoot(), 'app/extension-dependencies.json'),
+		file = jsonf.read(p);
+
+	file.set(this.package, this.version_or_source)
+		.writeSync(null, '\t');
+};
+/**
+Update the app/extensions-dependencies.json file.
 */
 
 ExtensionGenerator.prototype.proxyGenerators = function proxyGenerators() {
@@ -164,7 +152,7 @@ ExtensionGenerator.prototype.proxyGenerators = function proxyGenerators() {
 
 
 	queue.then(function() {
-		this.log.create('GREAT!');
+		this.log.ok('I am done!');
 
 		cb();
 	}.bind(this))
@@ -173,5 +161,5 @@ ExtensionGenerator.prototype.proxyGenerators = function proxyGenerators() {
 Invokes 'extend:proxy' subgenerator in order to create the directory structure that
 will emulate the extended subgenerators.
 
-Does stuff asynchronously so that user can confirm or deny file overwrites.
+Does stuff asynchronously so that the user can confirm or deny file overwrites.
 */
