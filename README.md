@@ -65,7 +65,21 @@ The value in package.json `dependencies` and `devDependencies` hashes.
 
 #### Proxy Generators
 
-Generator inheritance is 
+The concept of _proxy generators_ is at the core of generator inheritance.
+_Proxy generators_ simulate the file structure that Yo recognizes as that 
+of subgenerators.
+
+First lets have a look at how Yo recognizes generators and their subgenerators:
+
+    generator-generator/
+        app/
+            index.js
+            templates/
+            ...
+        subgenerator/
+            index.js
+            templates/
+            ...
 
 #### Dependency transfers
 
