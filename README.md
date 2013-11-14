@@ -7,14 +7,14 @@ Maintainer: [Simon Fan](https://github.com/simonfan)
 For simplicity's sake it is important to have a set of 
 conventions in this man page. 
 
-_GENERATOR_ refers to the generator-package at which the 
+_generator_ refers to the generator-package at which the 
 `yo extend` method was invoked.
 
-_PARENT-GENERATOR_ refers to a generator-package from 
-which _GENERATOR_ inherits subgenerators.
+_parent-generator_ refers to a generator-package from 
+which _generator_ inherits subgenerators.
 
 _GENERATED-PROJECT_ refers to the project that should be 
-scaffolded by _GENERATOR_.
+scaffolded by _generator_.
 
 
 ## Usage
@@ -42,18 +42,18 @@ Run any of the following:
 
 #### `generator`
 
-The _PARENT-GENERATOR_.
+The _parent-generator_.
 
 #### `subgenerators`
 
-The subgenerators that the _GENERATOR_ should inherit from the _PARENT-GENERATOR_.
+The subgenerators that the _generator_ should inherit from the _parent-generator_.
 
 #### `package`
 #### `version_or_source`
 
-The npm package name for the _PARENT-GENERATOR_.
+The npm package name for the _parent-generator_.
 dependencies: {
-    _PARENT-GENERATOR_: _version_or_package_source_
+    _parent-generator_: _version_or_package_source_
 }
 
 
