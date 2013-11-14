@@ -1,12 +1,12 @@
 {
-  "name": "generator-extendable-generator",
+  "name": "generator-extend",
   "version": "0.0.0",
   "description": "A generator for Yeoman",
   "keywords": [
     "yeoman-generator"
   ],
-  "homepage": "https://github.com/simonfan/generator-extendable-generator",
-  "bugs": "https://github.com/simonfan/generator-extendable-generator/issues",
+  "homepage": "https://github.com/simonfan/generator-extend",
+  "bugs": "https://github.com/simonfan/generator-extend/issues",
   "author": {
     "name": "",
     "email": "",
@@ -15,7 +15,7 @@
   "main": "app/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/simonfan/generator-extendable-generator.git"
+    "url": "git://github.com/simonfan/generator-extend.git"
   },
   "scripts": {
     "test": "mocha"
