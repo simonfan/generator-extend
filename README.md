@@ -1,4 +1,5 @@
-# Yo Extend
+Yo Extend
+=========
 
 Maintainer: [Simon Fan](https://github.com/simonfan)
 
@@ -7,14 +8,14 @@ Maintainer: [Simon Fan](https://github.com/simonfan)
 For simplicity's sake it is important to have a set of 
 conventions in this man page. 
 
-_generator_ refers to the generator-package at which the 
+__generator__ refers to the generator-package at which the 
 `yo extend` method was invoked.
 
-_parent-generator_ refers to a generator-package from 
-which _generator_ inherits subgenerators.
+__parent-generator__ refers to a generator-package from 
+which __generator__ inherits subgenerators.
 
-_GENERATED-PROJECT_ refers to the project that should be 
-scaffolded by _generator_.
+__generated-project__ refers to the project that should be 
+scaffolded by __generator__.
 
 
 ## Usage
@@ -42,26 +43,29 @@ Run any of the following:
 
 #### `generator`
 
-The _parent-generator_.
+The __parent-generator__.
 
 #### `subgenerators`
 
-The subgenerators that the _generator_ should inherit from the _parent-generator_.
+The subgenerators that the __generator__ should inherit from the __parent-generator__.
 
 #### `package`
+
+The npm package name for the __parent-generator__.
+The key in package.json `dependencies` and `devDependencies` hashes.
+
 #### `version_or_source`
 
-The npm package name for the _parent-generator_.
-dependencies: {
-    _parent-generator_: _version_or_package_source_
-}
+The version or the source of the __parent-generator__
+The value in package.json `dependencies` and `devDependencies` hashes.
+
 
 
 ## Under the hood
 
-### Proxy Generators
+#### Proxy Generators
 
 Generator inheritance is 
 
-### Dependency transfers
+#### Dependency transfers
 
