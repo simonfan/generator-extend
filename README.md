@@ -22,22 +22,22 @@ scaffolded by __generator__.
 
 Install `generator-extend`:
 
-    npm install -g generator-extend
+	npm install -g generator-extend
 
 Make a new directory, and `cd` into it:
 
-    mkdir my-new-generator && cd $_
+	mkdir my-new-generator && cd $_
 
 Start your generator:
 
-    yo generator
+	yo generator
 
 Run any of the following:
 
-    yo extend
-    yo extend %someGenerator
-    yo extend %someGenerator:%someSubGenerator
-    yo extend %someGenerator:%someSubGenerator,%someOtherSubGenerator,%andYetAnother
+	yo extend
+	yo extend %someGenerator
+	yo extend %someGenerator:%someSubGenerator
+	yo extend %someGenerator:%someSubGenerator,%someOtherSubGenerator,%andYetAnother
 
 ## Prompts
 
@@ -71,15 +71,51 @@ of subgenerators.
 
 First lets have a look at how Yo recognizes generators and their subgenerators:
 
-    generator-generator/
-        app/
-            index.js
-            templates/
-            ...
-        subgenerator/
-            index.js
-            templates/
-            ...
+	generator-<%= generatorName %>/		// root
+		app/								// app-subgenerator (main) (generator:app | generator)
+			index.js						// runs app-generation logic
+			...
+		<%= subgeneratorName %>/			// subgenerator-subgenerator (generator:subgenerator)
+			index.js						// runs subgenerator-generation logic
+			...
+
+Any dir with `index.js` in the generator's package root is considered a subgenerator.
+
+
+Extension and inheritance allow for code reuse by centralizing logic in specific modules.
+This behaviour is extremely desirable in the Yo Generators environment, 
+as projects have multiple features in common, especially in the subgenerator area.
+
+	generator-express/
+		app/
+			index.js			// scaffolds what express(1).
+			templates/
+
+	generator-express-base/
+		app/
+			index.js			// express-base:app proxy -> invokes 'express:app'
+		route/					// express-base:route
+			index.js
+			templates/
+
+
+	generator-express-rest/
+		app/
+			index.js			// proxy -> invokes 'express:app'
+		endpoint/
+			index.js			// express-rest:endpoint proxy -> express-base:route 
+								// + endpoint specific tasks
+			templates/
+				_endpoint.js
+
+	generator-express-markdown-server/
+		app/
+			index.js			// proxy -> invokes 'express:app'
+		markdown-server/
+			index.js			// invokes express-base:route
+								// + markdown-server specific tasks
 
 #### Dependency transfers
 
+For _proxy generators_ to be functional, they have to be accessible within the
+__generated-project__.
